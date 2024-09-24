@@ -1,1 +1,33 @@
 .DS_Store
+
+# Terraform specific files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Kubernetes specific files
+.kube/
+kubeconfig
+kubectl-config
+
+# Log files
+*.log
+
+# Ignore Mac specific files
+.DS_Store
+
+# Ignore sensitive data
+secrets.yaml
+*.pem
+*.key
+*.crt
+
+# Ignore IDE specific files (Optional, if you are using any IDE like VSCode, IntelliJ, etc.)
+.vscode/
+.idea/
+*.iml
+
+# Ignore Docker-specific files (if using Docker in the project)
+docker-compose.override.yml
+.env
