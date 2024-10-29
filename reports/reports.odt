@@ -1,7 +1,8 @@
+﻿Project Side Notes and Reports
+
 Provisioning Cloud Resources:
 three ways:
 GUI, API/CLI, and IaC
-
 
 Terraform:
 Terraform is an infrastructure-as-code software tool created by HashiCorp. Users define and provide data center infrastructure using a declarative configuration language known as HashiCorp Configuration Language, or optionally JSON
@@ -13,7 +14,7 @@ Server templating tools
 Orchestration tools 
 Provisioning tools 
 
-## Common Patterns for using Terraform with other tools:
+Common Patterns for using Terraform with other tools:
 Provisioning (Terraform) + Config management:
 such as Ansible - 
 
@@ -106,3 +107,27 @@ aws_s3_bucket.terraform_state is used to refer to this specific instance of the 
 Key Difference:
 aws_s3_bucket: Defines the type of resource (an S3 bucket on AWS).
 terraform_state: Names this specific instance of the S3 bucket, making it accessible elsewhere in the code by the identifier terraform_state.
+
+
+HCL (HashiCorp Configuration Language) is a configuration language designed for infrastructure automation. It has a syntax similar to JSON and supports booleans, integers, strings and more.
+
+
+
+In Terraform, state management and state locking are crucial for tracking infrastructure changes, managing resources efficiently, and preventing conflicts, especially in collaborative environments.
+State Management
+Terraform maintains a state file (terraform.tfstate) to keep track of the resources it manages and their current state in the cloud provider. This file serves as a source of truth that Terraform references to understand the infrastructure’s current state and to calculate any necessary changes. For example:
+    1. You define an AWS EC2 instance in your Terraform configuration.
+    2. On the first terraform apply, Terraform creates the EC2 instance and records its details (like the instance ID) in the state file.
+    3. If you later modify the configuration, like changing the instance type, Terraform compares the new configuration with the state file to identify and apply only the necessary changes.
+Without this state file, Terraform would not be able to track changes and could re-create resources unnecessarily, leading to resource duplication, service disruption, or data loss.
+State Locking
+State locking prevents multiple users or processes from modifying the same Terraform state file simultaneously, which can cause conflicts or corrupt the state. Terraform achieves this through a state lock mechanism, which it enables when using a remote backend (e.g., AWS S3 for storage and DynamoDB for locking).
+Example of State Locking:
+Suppose two developers, Alice and Bob, are working on the same Terraform project using an S3 bucket for state storage and a DynamoDB table for state locking:
+    1. Alice runs terraform apply to add a new security group. When Alice initiates the command, the DynamoDB lock prevents anyone else from updating the state.
+    2. If Bob tries to run terraform apply at the same time, he’ll receive an error that the state is locked. He must wait until Alice's process completes and the lock is released.
+    3. Once Alice’s changes are applied, the lock is removed, and Bob can then safely make his own updates.
+This process prevents both Alice and Bob from applying conflicting infrastructure changes at the same time, reducing the risk of errors and resource misconfiguration.
+
+
+

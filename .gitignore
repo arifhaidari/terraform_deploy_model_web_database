@@ -13,6 +13,7 @@ kubectl-config
 
 # Log files
 *.log
+reports/.~lock.reports.odt#
 
 # Ignore Mac specific files
 .DS_Store
