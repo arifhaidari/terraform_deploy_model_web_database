@@ -1,0 +1,108 @@
+Provisioning Cloud Resources:
+three ways:
+GUI, API/CLI, and IaC
+
+
+Terraform:
+Terraform is an infrastructure-as-code software tool created by HashiCorp. Users define and provide data center infrastructure using a declarative configuration language known as HashiCorp Configuration Language, or optionally JSON
+
+infrastructure as a code:
+Ad hoc scripts
+Configuration management tools 
+Server templating tools 
+Orchestration tools 
+Provisioning tools 
+
+## Common Patterns for using Terraform with other tools:
+Provisioning (Terraform) + Config management:
+such as Ansible - 
+
+Terraform + Server templating or templating tools:
+such as Packer template which is also HashiCorp tools:
+packers used to build image from which those virtual machine are created. 
+Packer's behavior is determined by the Packer template, which consists of a series of declarations and commands for Packer to follow. This template tells Packer what plugins (builders, provisioners, post-processors) to use, how to configure each of those plugins, and what order to run them in.
+
+Terraform + Orchestration tool like Kubernetes:
+define the cloud Resources
+
+
+Terraform state file:
+Terraform logs information about the resources it has created in a state file. This enables Terraform to know which resources are under its control and when to update and destroy them. The terraform state file, by default, is named terraform. tfstate and is held in the same directory where Terraform is run.
+
+1. Provider
+A provider is a plugin that Terraform uses to interact with various APIs for cloud services, SaaS platforms, or other technologies. Providers offer Terraform the ability to communicate with these services to create, read, update, and delete resources.
+
+In Terraform, you declare providers in the configuration to specify:
+
+Which service to use (e.g., AWS, Google Cloud, Azure).
+Any necessary configurations, like authentication credentials, API endpoints, and regions.
+Example of Provider: In the code you provided, the aws provider allows Terraform to manage resources on AWS.
+code:
+provider "aws" {
+  region = var.aws_region
+}
+Here, the aws provider is configured with the region attribute, set to var.aws_region. This tells Terraform to use the AWS provider and specifies the region where the AWS resources should be created (e.g., us-east-1).
+2. Resource
+A resource is an instance of a service component provided by a provider, like an EC2 instance, an S3 bucket, or a DynamoDB table. Resources represent the actual pieces of infrastructure you want to create, manage, or destroy.
+
+Example of Resources: In the code, several AWS resources are declared, such as an S3 bucket and a DynamoDB table. Here’s an example:
+
+code:
+resource "aws_s3_bucket" "terraform_state" {
+  bucket        = var.s3_bucket_name
+  force_destroy = true
+}
+This aws_s3_bucket resource represents an S3 bucket created on AWS.
+The bucket parameter is set to var.s3_bucket_name, specifying the bucket's name.
+The force_destroy parameter, set to true, allows Terraform to delete the bucket even if it’s not empty.
+Similarly, this resource block creates a DynamoDB table:
+
+code:
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-state-locking"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+This table will be used to lock the state file, preventing simultaneous updates.
+
+Summary
+Provider: Configures Terraform to use a specific service (e.g., AWS) and defines settings to interact with it.
+Resource: Defines an actual infrastructure component to be created on that provider (e.g., an S3 bucket or DynamoDB table on AWS).
+
+
+In this Terraform code, terraform_state is the name given to a specific instance of the aws_s3_bucket resource. It is a user-defined identifier that Terraform uses to refer to this particular S3 bucket instance in the configuration.
+
+Here’s a breakdown:
+
+aws_s3_bucket
+aws_s3_bucket is the resource type provided by the AWS provider.
+It tells Terraform that this resource is an S3 bucket on AWS.
+The resource type, in this case, includes all the attributes and configurations required to create and manage an S3 bucket.
+terraform_state
+terraform_state is the resource name, an identifier given to this specific instance of the aws_s3_bucket resource.
+This name is unique within the configuration and allows you to reference this S3 bucket elsewhere in the code.
+For example, if you wanted to enable versioning on this bucket, you can refer to it as aws_s3_bucket.terraform_state.
+Example of Usage in Code:
+
+code:
+resource "aws_s3_bucket" "terraform_state" {
+  bucket        = var.s3_bucket_name
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_versioning" "terraform_bucket_versioning" {
+  bucket = aws_s3_bucket.terraform_state.id  # Referring to 'terraform_state' here
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+Here:
+
+aws_s3_bucket.terraform_state is used to refer to this specific instance of the S3 bucket, making it possible to enable versioning for terraform_state.
+Key Difference:
+aws_s3_bucket: Defines the type of resource (an S3 bucket on AWS).
+terraform_state: Names this specific instance of the S3 bucket, making it accessible elsewhere in the code by the identifier terraform_state.

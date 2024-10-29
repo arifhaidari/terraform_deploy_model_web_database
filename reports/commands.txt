@@ -1,0 +1,27 @@
+# to configure the command line tools for aws
+aws configure 
+# then get the access key id and secret key of the IAM user 
+
+#when you have main.tf and then run:
+terraform init
+# it will initialize the backend - and you do it in the directory where the code is stored 
+# it will also create .terraform folder 
+
+
+# the plan comamand 
+terraform plan
+#  creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure. By default, when Terraform creates a plan it: Reads the current state of any already-existing remote objects to make sure that the Terraform state is up-to-date.
+
+
+# if all good then apply
+terraform apply
+# terminal output: Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+# executes planned actions, creating, updating, or deleting infrastructure resources to match the new state outlined in your IaC. Before making any real changes to the infrastructure, terraform apply provides an execution plan for reviewing the changes, ensuring transparency and control.
+
+# to destroy  the instance in EC2
+terraform destroy
+# worth to mention while running that - need to be in the directory of main.tf or the script 
+
+terraform state list  
+terraform state rm aws_instance.start_instance
+
