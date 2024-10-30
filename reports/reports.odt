@@ -130,4 +130,42 @@ Suppose two developers, Alice and Bob, are working on the same Terraform project
 This process prevents both Alice and Bob from applying conflicting infrastructure changes at the same time, reducing the risk of errors and resource misconfiguration.
 
 
+Input Variable:
+input variables are used to pass certain values from outside of the configuration or module. 
+They are used to assign dynamic values to resource attributes. The difference between local and 
+input variables is that input variables allow you to pass values before the code execution.
+
+Output variable:
+ Input Variables serve as parameters for a Terraform module, so users can customize behavior 
+ without editing the source. Output Values are like return values for a Terraform module.
+
+Consul in HashiCorp:
+Consul is a distributed, highly available, and data center aware solution to connect and configure 
+applications across dynamic, distributed infrastructure
+Consul automates service discovery by replacing service connections usually handled with 
+load balancers with an identity-based service catalog. The service catalog is a centralized 
+source of truth that you can query through Consul's DNS server or API.
+
+
+Terragrunt:
+Terragrunt is a thin wrapper for Terraform that provides extra tools for keeping your Terraform 
+configurations DRY (Don't Repeat Yourself). With Terragrunt, you can easily manage remote states 
+and multiple environments. It also helps you keep your codebase clean and organized.
+Terraform is designed to build and configure infrastructure, while Terragrunt is a thin wrapper 
+that is built on top of Terraform. Terraform is created to operate at the resource level, while 
+Terragrunt is designed to handle complex infrastructure deployments, which is typically 
+composed of multiple Terraform modules.
+
+
+Workspace:
+Workspaces let you quickly switch between multiple instances of a single configuration within its 
+single backend. They are not designed to solve all problems. When using Terraform to manage larger 
+systems, you should create separate Terraform configurations that correspond to architectural 
+boundaries within the system.
+
+File system approach:
+file system approach is good for provisioning because the whole infrastructure is more visible to the 
+the developer and the downside is that there is a lot repetition.
+
+
 

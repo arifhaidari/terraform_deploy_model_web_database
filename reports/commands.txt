@@ -25,3 +25,30 @@ terraform destroy
 terraform state list  
 terraform state rm aws_instance.start_instance
 
+
+# Terraform commands
+# First we initialize in the folder where we define the workspace main.tf file
+terraform init
+# then check if there is any workspace
+terraform workspace list
+#then create a new one 
+terraform workspace new [workspace_name_new] # here workspace_name_new can be production
+#then apply the changes and actions
+terraform apply 
+# then create another workspace 
+terraform workspace new staging
+# and then apply - you will provision another copy of your web app
+terraform apply 
+# and when destroying them then destroy in both 
+
+
+# to test which file has changes to be formated
+terraform fmt --check 
+# to form the Code
+terraform fmt 
+
+# the command solve the problem
+watch "curl ip_address:port"
+
+
+
