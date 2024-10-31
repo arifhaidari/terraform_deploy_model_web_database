@@ -1,0 +1,6 @@
+in the global directory are the files and resources which are used in both staging 
+and production
+
+first first we initiate and run the the global and then the rest 
+
+and then go to the production or staging directory and initiate and apply the resources there

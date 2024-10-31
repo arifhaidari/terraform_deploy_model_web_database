@@ -1,0 +1,9 @@
+Explanation of Environment Differentiation
+This configuration uses Terraform workspaces to distinguish between environments (like production and staging). 
+The local.environment_name variable dynamically captures the workspace name, allowing conditional configurations 
+and unique resource naming. For example:
+
+create_dns_zone is set to true only if the workspace is production, meaning DNS resources will only be created 
+in production.
+Resources like the S3 bucket prefix and database name are prefixed with the environment name 
+(web-app-data-staging or web-app-data-production), ensuring unique identifiers across environments.

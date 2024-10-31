@@ -173,3 +173,5 @@ These two files are similar but are not the same. Syntactically speaking, the va
 used to define the variable's type and optionally set a default value. A terraform. tfvars file 
 is used to set the actual values of the variables.
 
+
+
