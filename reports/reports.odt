@@ -168,4 +168,8 @@ file system approach is good for provisioning because the whole infrastructure i
 the developer and the downside is that there is a lot repetition.
 
 
+difference between .tf and .tfvars:
+These two files are similar but are not the same. Syntactically speaking, the variables.tf file is 
+used to define the variable's type and optionally set a default value. A terraform. tfvars file 
+is used to set the actual values of the variables.
 

@@ -10,6 +10,8 @@ I will now use Terraform's helm provider to deploy the same WordPress applicatio
 
 AWS instance configuration
 
+deploying using workflow - CI/CD pipelines - Github Actions
+
      ├── README.md
      ├── aws-data2
      │ ├── ebs.tf

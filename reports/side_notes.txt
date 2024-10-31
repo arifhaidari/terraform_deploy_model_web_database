@@ -1,0 +1,117 @@
+Overview + Setup
+Install Terraform
+Official installation instructions from HashiCorp: https://learn.hashicorp.com/tutorials/terraform/install-cli
+
+AWS Account Setup
+AWS Terraform provider documentation: https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication
+
+create non-root AWS user
+Add the necessary IAM roles (e.g. AmazonEC2FullAccess)
+Save Access key + secret key (or use AWS CLI aws configure -- https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+Hello World
+./main.tf contains minimal configuration to provision an EC2 instance.
+
+aws configure
+terraform init
+terraform plan
+terraform apply
+
+
+-------
+
+Remote Backends
+Remote backends enable storage of TF state in a remote, location to enable secure collaboration.
+
+Terraform Cloud
+https://www.terraform.io/cloud
+
+./terraform-cloud-backend/main.tf
+
+AWS S3 + Dynamo DB
+Steps to initialize backend in AWS and manage it with Terraform:
+
+Use config from ./aws-backend/ (init, plan, apply) to provision s3 bucket and dynamoDB table with local state
+Uncomment the remote backend configuration
+Reinitialize with terraform init:
+Do you want to copy existing state to the new backend?
+  Pre-existing state was found while migrating the previous "local" backend to the
+  newly configured "s3" backend. No existing state was found in the newly
+  configured "s3" backend. Do you want to copy this state to the new "s3"
+  backend? Enter "yes" to copy and "no" to start with an empty state.
+
+  Enter a value: yes 
+Now the S3 bucket and dynamoDB table are mam and are able to be used as the state backend!
+
+Web-App
+Generic web application architecture including:
+
+EC2 instances
+S3 bucket
+RDS instance
+Load balancer
+Route 53 DNS config
+This example will be refined and improved in later modules.
+
+
+----------
+
+Variables
+Variable block
+must define variable block
+
+variable "var_name" {
+  type = string
+}
+Variable types
+string
+number
+bool
+list()
+set()
+map()
+object({ = , ... })
+tuple([, ...])
+Variable files
+variables.tfvars (or <FILENAME>.auto.tfvars) automatically applied
+
+Apply default
+terraform apply
+
+Apply a different variable file
+terraform apply -var-file=another-variable-file.tfvars
+
+Passing Variable via Prompt
+If value not specified, Terraform will prompt for value. (this is okay for testing... but don't depend on it since you should be automating things!)
+
+  var.db_pass
+  password for database
+
+  Enter a value:
+Passing Variables via CLI
+terraform apply -var="db_pass=$DB_PASS_ENV_VAR"
+
+Local Variables
+Allows you to store the value of expression for reuse but doesn't allow for passing in values
+
+locals {
+  extra_tag = "extra-tag"
+}
+Output Variables
+Allows you to output some value (which might not be known ahead of time).
+
+For example it might be useful to know the IP address of a VM that was created:
+
+output "instance_ip_addr" {
+  value = aws_instance.instance.private_ip
+}
+Sample output:
+
+db_instance_addr = "terraform-20210504182745335900000001.cr2ub9wmsmpg.us-east-1.rds.amazonaws.com"
+instance_ip_addr = "172.31.24.95"
+Will be output after terraform apply or terraform output
+
+
+------
+
+
+
