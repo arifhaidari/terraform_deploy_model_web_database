@@ -4,3 +4,6 @@ and production
 first first we initiate and run the the global and then the rest 
 
 and then go to the production or staging directory and initiate and apply the resources there
+
+
+file system approach the better way (in my opinion) and of course there are trade offs as well in both approach
