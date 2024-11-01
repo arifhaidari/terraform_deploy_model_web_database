@@ -1,0 +1,6 @@
+Steps to run the workflow:
+
+populate the access key, secret key and db pass in in secret and variable in github 
+
+
+
