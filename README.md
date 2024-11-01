@@ -14,7 +14,7 @@ A learning-driven project using **Terraform** to deploy, manage, and experiment 
 
 ## **Project Overview**
 
-This repository was created as a part of a hands-on project to develop proficiency with **Terraform** for managing and deploying infrastructure on **AWS**. The project demonstrates infrastructure automation and orchestration practices, from provisioning AWS EC2 instances and EBS volumes to deploying a WordPress application on a Kubernetes cluster using Helm charts. A CI/CD pipeline with GitHub Actions further facilitates deployment automation and workflow optimization.
+This repository was created as a part of a hands-on project to develop proficiency with **Terraform** for managing and deploying infrastructure on **AWS**. The project demonstrates infrastructure automation and orchestration practices, from provisioning AWS EC2 instances and EBS volumes to deploying a web application on a Kubernetes cluster using Helm charts. A CI/CD pipeline with GitHub Actions further facilitates deployment automation and workflow optimization.
 
 ## **Project Structure**
 
@@ -50,7 +50,7 @@ The folder structure organizes the code and resources, enabling easy navigation 
 ### **Detailed Folder Explanations**
 
 1. **aws-data2**: Contains configurations to provision resources on AWS, such as EC2 instances, EBS volumes, and security groups.
-2. **kubernetes**: Configures the Kubernetes provider and includes Helm charts for deploying MySQL and WordPress applications. This includes files for managing Kubernetes resources and testing connections using Helm.
+2. **kubernetes**: Configures the Kubernetes provider and includes Helm charts for deploying MySQL and web applications. This includes files for managing Kubernetes resources and testing connections using Helm.
 
 3. **n1_start**: Basic Terraform setup to initialize the project and practice foundational commands.
 
@@ -76,7 +76,7 @@ The folder structure organizes the code and resources, enabling easy navigation 
 
 ### **Kubernetes with Helm**
 
-- **MySQL and WordPress Deployment**: Used Helm charts for MySQL and WordPress in the `kubernetes/charts` directory to deploy applications on Kubernetes clusters.
+- **MySQL and web Deployment**: Used Helm charts for MySQL and WordPress in the `kubernetes/charts` directory to deploy applications on Kubernetes clusters.
 - **Helm Provider**: Leveraged Terraform's Helm provider for efficient management and versioning of Kubernetes resources.
 
 ### **CI/CD Pipeline with GitHub Actions**
