@@ -8,6 +8,8 @@ I did deploy using kubernetes provider.
 
 I will now use Terraform's helm provider to deploy the same WordPress application on the Kubernetes cluster, but this time using Helm charts.
 
+in another part of this repo I will experiment different aspects of terraform
+
 AWS instance configuration
 
 deploying using workflow - CI/CD pipelines - Github Actions

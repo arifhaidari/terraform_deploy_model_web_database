@@ -1,56 +1,80 @@
+# Workflow name for organizing and identifying this job in GitHub Actions
 name: "Terraform"
 
+# Event triggers for the workflow
 on:
-  # make sure to comment the trigger part to avoid repeatatively deploying
+  # The workflow can be triggered on a push to the main branch, release event, or pull request
+  # The push trigger is commented out to avoid repeated deployments on each push to main.
+  # Uncomment if you want the workflow to run whenever code is pushed to the main branch.
   # push:
   #   branches:
   #     - main
+
+  # Triggers when a new release is published, allowing deployment in production when a version is tagged.
   release:
     types: [published]
+
+  # Also triggers when a pull request is created, allowing testing and planning before merging to main.
   pull_request:
 
+# Job definition for Terraform actions
 jobs:
   terraform:
+    # Defines a job named "Terraform" for executing Terraform commands
     name: "Terraform"
+
+    # Specifies that the job should run on an Ubuntu virtual machine
     runs-on: ubuntu-latest
+
+    # Sets up environment variables using GitHub Secrets for secure access to AWS credentials
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    # Default working directory for the Terraform commands in the staging environment
     defaults:
       run:
         working-directory: n5_multiple_env/file_structure/staging
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
 
+    # Steps represent individual actions executed in sequence
+    steps:
+      # Step 1: Check out the latest code from the repository
+      - name: Checkout
+        uses: actions/checkout@v2 # Uses the checkout action to access the repository files
+
+      # Step 2: Setup Terraform by specifying the Terraform version
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
+          terraform_version: 1.0.1 # Sets the Terraform version to 1.0.1
+          terraform_wrapper: false # Disables the Terraform wrapper for direct usage
 
+      # Step 3: Run Terraform Format (fmt) to check code style consistency
       - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
+        id: fmt # Identifier for referencing this step later
+        run: terraform fmt -check # Checks if the code is formatted properly
 
+      # Step 4: Initialize Terraform to download plugins and set up the environment
       - name: Terraform Init
-        id: init
+        id: init # Identifier for referencing this step later
         run: terraform init
 
+      # Step 5: Run Terraform Plan to preview infrastructure changes for pull requests
       - name: Terraform Plan
-        id: plan
-        if: github.event_name == 'pull_request'
-        # Route 53 zone must already exist for this to succeed!
-        run: terraform plan -var db_pass=${{secrets.DB_PASS }} -no-color
-        continue-on-error: true
+        id: plan # Identifier for referencing this step later
+        if: github.event_name == 'pull_request' # Only runs on pull request events
+        run: terraform plan -var db_pass=${{secrets.DB_PASS }} -no-color # Generates an execution plan
+        continue-on-error: true # Allows the job to continue if plan fails (e.g., for PR feedback)
 
+      # Step 6: Use GitHub Script to comment the Terraform plan output on the pull request
       - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' # Only comments for pull request events
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}" # Stores the plan output
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Authenticates with GitHub to comment
           script: |
+            # Constructs a comment summarizing the Terraform steps and plan outcome
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
@@ -63,7 +87,7 @@ jobs:
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-              
+            # Posts the constructed comment on the pull request
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -71,42 +95,50 @@ jobs:
               body: output
             })
 
+      # Step 7: Check Terraform Plan Status and exit if the plan fails
       - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+        if: steps.plan.outcome == 'failure' # Checks if the plan failed
+        run: exit 1 # Exits the job if there was a failure in the plan step
 
+      # Step 8: Set up Go for running Terratest (testing Terraform infrastructure)
       - uses: actions/setup-go@v2
         with:
-          go-version: "^1.15.5"
+          go-version: "^1.15.5" # Specifies Go version 1.15.5
 
+      # Step 9: Run Terratest to test Terraform infrastructure with Go-based tests
       - name: Terratest Execution
-        if: github.event_name == 'pull_request'
-        working-directory: n6_bash_testing/tests/terratest
+        if: github.event_name == 'pull_request' # Only runs on pull request events
+        working-directory: n6_bash_testing/tests/terratest # Specifies the test directory
         run: |
-          go test . -v timeout 10m
+          go test . -v timeout 10m  # Runs Terratest with a timeout of 10 minutes
 
+      # Step 10: Check tag or branch to determine the deployment environment (staging or production)
       - name: Check tag
-        id: check-tag
+        id: check-tag # Identifier for referencing this step later
         run: |
+          # Sets environment based on the tag or branch
           if [[ ${{ github.ref }} =~ ^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo ::set-output name=environment::production
           elif [[ ${{ github.ref }} == 'refs/heads/main' ]]; then echo ::set-output name=environment::staging
           else echo ::set-output name=environment::unknown
           fi
 
+      # Step 11: Apply Terraform globally on a push to main or a release
       - name: Terraform Apply Global
-        if: github.event_name == 'push' || github.event_name == 'release'
-        working-directory: n5_multiple_env/file_structure/global
+        if: github.event_name == 'push' || github.event_name == 'release' # Executes on push or release
+        working-directory: n5_multiple_env/file_structure/global # Sets global directory
         run: |
-          terraform init
-          terraform apply -auto-approve
+          terraform init  # Initializes Terraform
+          terraform apply -auto-approve  # Applies changes automatically without confirmation
 
+      # Step 12: Apply Terraform in Staging environment if on main branch push
       - name: Terraform Apply Staging
-        if: steps.check-tag.outputs.environment == 'staging' && github.event_name == 'push'
-        run: terraform apply -var db_pass=${{secrets.DB_PASS }} -auto-approve
+        if: steps.check-tag.outputs.environment == 'staging' && github.event_name == 'push' # Ensures it's staging
+        run: terraform apply -var db_pass=${{secrets.DB_PASS }} -auto-approve # Deploys to staging
 
+      # Step 13: Apply Terraform in Production if tagged release
       - name: Terraform Apply Production
-        if: steps.check-tag.outputs.environment == 'production' && github.event_name == 'release'
-        working-directory: n5_multiple_env/file_structure/production
+        if: steps.check-tag.outputs.environment == 'production' && github.event_name == 'release' # Ensures production
+        working-directory: n5_multiple_env/file_structure/production # Sets production directory
         run: |
-          terraform init
-          terraform apply -var db_pass=${{secrets.DB_PASS }} -auto-approve
+          terraform init  # Initializes Terraform
+          terraform apply -var db_pass=${{secrets.DB_PASS }} -auto-approve  # Deploys to production
